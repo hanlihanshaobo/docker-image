@@ -3,6 +3,7 @@ name: Docker Image CI
 on:
   push:
     repository_dispatch:
+    workflow_dispatch:
     branches: [ master ]
   pull_request:
     branches: [ master ]
