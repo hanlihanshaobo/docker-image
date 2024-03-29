@@ -2,6 +2,7 @@ name: Docker Image CI
 
 on:
   push:
+    repository_dispatch:
     branches: [ master ]
   pull_request:
     branches: [ master ]
