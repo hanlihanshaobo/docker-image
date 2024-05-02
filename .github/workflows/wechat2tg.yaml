@@ -44,10 +44,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Clone source code
-      working-directory: /workdir
-      run: |
-        df -hT $PWD
-        git clone https://github.com/wangxinleo/wechat-public-account-push.git docker
+        working-directory: /workdir
+        run: |
+          df -hT $PWD
+          git clone https://github.com/wangxinleo/wechat-public-account-push.git docker
 
       - name: Build and push
         uses: docker/build-push-action@v2
