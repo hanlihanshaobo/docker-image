@@ -44,7 +44,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Clone source code
-        working-directory: /workdir
+     #   working-directory: /workdir
         run: |
           df -hT $PWD
           git clone https://github.com/wangxinleo/wechat-public-account-push.git docker
