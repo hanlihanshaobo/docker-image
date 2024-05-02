@@ -10,16 +10,16 @@
 # See /LICENSE for more information.
 #
 
-name: Update Checker
+name: Update wechat2tg Checker
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: https://github.com/finalpi/wechat2tg.git
   REPO_BRANCH: master
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: 0 */18 * * *
+  schedule:
+    - cron: 30 18 * * 6
 
 jobs:
   check:
