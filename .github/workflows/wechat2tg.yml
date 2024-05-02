@@ -48,6 +48,7 @@ jobs:
         run: |
           df -hT $PWD
           git clone https://github.com/finalpi/wechat2tg.git docker
+          docker builddocker buildx buildinstall: truesetup-buildx-action
 
       - name: Build and push
         uses: docker/build-push-action@v2
