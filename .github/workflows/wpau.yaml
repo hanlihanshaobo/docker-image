@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: build docker image
+name: build docker-wpau image
 # Controls when the action will run.
 on:
   #push:
@@ -53,7 +53,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./docker
-          file: ./Dockerfile
+          file: ./Dockerfile-wpau
           # 所需要的体系结构，可以在 Available platforms 步骤中获取所有的可用架构
           platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
           # 镜像推送时间
