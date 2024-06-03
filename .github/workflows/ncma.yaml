@@ -48,7 +48,7 @@ jobs:
         run: |
           df -hT $PWD
           git clone https://gitlab.com/Binaryify/neteasecloudmusicapi.git docker
-          #sed -i '10 i RUN npm install -g npm@10.7.0' docker/Dockerfile
+     #     sed -i '10 i RUN npm install -g npm@10.7.0' docker/Dockerfile
 
       - name: Build and push
         uses: docker/build-push-action@v2
