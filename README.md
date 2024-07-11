@@ -7,3 +7,5 @@
 原项目https://github.com/LaoYutang/clash-and-dashboard.git
 ## neteasecloudmusicapi项目
 原项目https://gitlab.com/Binaryify/neteasecloudmusicapi.git
+## siyuan-unlock项目
+原项目https://github.com/appdev/siyuan-unlock.git
