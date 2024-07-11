@@ -47,7 +47,7 @@ jobs:
      #   working-directory: /workdir
         run: |
           df -hT $PWD
-          git clone https://github.com/LaoYutang/clash-and-dashboard.git docker
+          git clone https://github.com/LaoYutang/clash-and-dashboard.git docker && npm install -g pnpm && pnpm i && pnpm build
      #     sed -i '10 i RUN npm install -g npm@10.7.0' docker/Dockerfile
 
       - name: Build and push
