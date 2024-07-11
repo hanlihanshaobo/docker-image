@@ -48,13 +48,13 @@ jobs:
         run: |
           df -hT $PWD
           git clone https://github.com/LaoYutang/clash-and-dashboard.git docker
-     #     sed -i '10 i RUN npm install -g npm@10.7.0' docker/Dockerfile
+          sed -i '10 i RUN npm install -g npm@10.7.0' docker/Dockerfile
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./docker/build
-          file: ./Dockerfile
+          file: ./docker/build/Dockerfile
           # 所需要的体系结构，可以在 Available platforms 步骤中获取所有的可用架构
           platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
           # 镜像推送时间
