@@ -1,4 +1,5 @@
 FROM alpine:latest
+mv .dockrt/ptool /usr/bin
 COPY --from=0 /usr/bin/ptool /usr/bin/ptool
 CMD ["crond","-f"]
 VOLUME /root/.config/ptool
