@@ -47,6 +47,7 @@ jobs:
        # working-directory: /workdir
         run: |
           df -hT $PWD
+          su root
           git clone https://github.com/sagan/ptool.git ptool
           cd ptool
           go build
