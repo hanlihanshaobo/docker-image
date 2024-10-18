@@ -50,6 +50,7 @@ jobs:
           git clone https://github.com/sagan/ptool.git ptool
           cd ptool
           go build
+          ls /usr/bin
           mv ptool /usr/bin
 
       - name: Build and push
