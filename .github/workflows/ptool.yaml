@@ -51,7 +51,9 @@ jobs:
           git clone https://github.com/sagan/ptool.git ptool
           cd ptool
           go build
+          ls 
           mv ptool ../docker
+          ls ../docker
 
       - name: Build and push
         uses: docker/build-push-action@v2
