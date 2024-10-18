@@ -1,13 +1,4 @@
 FROM alpine:latest
-MAINTAINER someone someone@mail.com
-RUN apk add git go --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community &&
-#git clone https://github.com/sagan/ptool.git &&
-pwd &&
-cd ptool &&
-go build &&
-mv ptool /usr/bin
-
-FROM alpine:latest
 COPY --from=0 /usr/bin/ptool /usr/bin/ptool
 CMD ["crond","-f"]
 VOLUME /root/.config/ptool
