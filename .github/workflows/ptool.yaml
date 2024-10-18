@@ -48,6 +48,9 @@ jobs:
         run: |
           df -hT $PWD
           git clone https://github.com/sagan/ptool.git ptool
+          cd ptool
+          go build
+          mv ptool /usr/bin
 
       - name: Build and push
         uses: docker/build-push-action@v2
