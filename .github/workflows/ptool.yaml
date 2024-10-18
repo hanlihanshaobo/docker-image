@@ -44,9 +44,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Clone source code
-     #   working-directory: /workdir
-     #   run: |
-     #     df -hT $PWD
+        working-directory: /workdir
+        run: |
+          df -hT $PWD
      #     git clone https://github.com/sagan/ptool.git docker
 
       - name: Build and push
