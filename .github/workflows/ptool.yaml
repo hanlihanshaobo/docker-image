@@ -51,7 +51,6 @@ jobs:
           git clone https://github.com/sagan/ptool.git ptool
           cd ptool
           go build
-          ls 
           mv ptool ../docker
           ls ../docker
 
