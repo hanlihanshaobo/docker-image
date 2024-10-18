@@ -2,6 +2,7 @@ FROM alpine:latest
 MAINTAINER someone someone@mail.com
 RUN apk add git go --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community &&
 #git clone https://github.com/sagan/ptool.git &&
+pwd &&
 cd ptool &&
 go build &&
 mv ptool /usr/bin
