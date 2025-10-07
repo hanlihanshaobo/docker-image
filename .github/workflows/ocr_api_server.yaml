@@ -37,18 +37,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Test network and repository access
+        run: |
+          ping -c 3 mirrors.aliyun.com
+          curl -I https://github.com/OpenListTeam/ocr_api_server.git
+
+      - name: Clone source code
+        run: |
+          df -hT $PWD
+          git clone https://github.com/OpenListTeam/ocr_api_server.git docker
+          if [ ! -d "docker" ]; then
+            echo "Error: Failed to clone repository, 'docker' directory not found."
+            exit 1
+          fi
+          cd docker
+          ls -la
+
       - name: Modify APT sources
         run: |
           cd docker
           echo "deb http://mirrors.aliyun.com/debian buster main" > sources.list
           echo "deb http://mirrors.aliyun.com/debian buster-updates main" >> sources.list
           echo "deb http://mirrors.aliyun.com/debian-security buster/updates main" >> sources.list
-
-      - name: Clone source code
-        run: |
-          df -hT $PWD
-          git clone https://github.com/OpenListTeam/ocr_api_server.git docker
-          cd docker
+          echo "COPY sources.list /etc/apt/sources.list" >> Dockerfile
 
       - name: Check requirements.txt
         run: |
