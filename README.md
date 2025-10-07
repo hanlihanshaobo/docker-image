@@ -9,3 +9,5 @@
 原项目https://gitlab.com/Binaryify/neteasecloudmusicapi.git
 ## siyuan-unlock项目
 原项目https://github.com/appdev/siyuan-unlock.git
+## ocr_api_server项目
+原项目https://github.com/OpenListTeam/ocr_api_server.git
