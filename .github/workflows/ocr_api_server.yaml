@@ -1,3 +1,4 @@
+# This is a basic workflow to help you get started with Actions
 name: build docker-ocr_api_server image
 
 on:
@@ -37,36 +38,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Test official Debian source connectivity
-        run: |
-          ping -c 3 deb.debian.org
-          ping -c 3 security.debian.org
-
       - name: Clone source code
         run: |
           df -hT $PWD
           git clone https://github.com/OpenListTeam/ocr_api_server.git docker
-          if [ ! -d "docker" ]; then
-            echo "Error: Failed to clone repository, 'docker' directory not found."
-            exit 1
-          fi
           cd docker
-          ls -la
 
-      - name: Check requirements.txt
+      - name: Modify Dockerfile
         run: |
           cd docker
-          cat requirements.txt
+          # 备份原始 Dockerfile
+          cp Dockerfile Dockerfile.bak
+          # 替换 apt-get 源为阿里云，并优化命令
+          sed -i 's|apt-get --allow-releaseinfo-change update|echo "deb http://mirrors.aliyun.com/debian buster main" > /etc/apt/sources.list \&\& apt-get update|g' Dockerfile
+          # 分离 apt-get install 命令并清理缓存
+          sed -i 's|apt install libgl1-mesa-glx libglib2.0-0 -y|apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 \&\& apt-get clean \&\& rm -rf /var/lib/apt/lists/*|g' Dockerfile
+          # 可选：分离 pip install 命令以便调试
+          sed -i 's|pip3 install --no-cache-dir -r requirements.txt|pip3 install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt|g' Dockerfile
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./docker
           file: ./docker/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             hanshaobo/ocr_api_server:${{ steps.date.outputs.today }}
             hanshaobo/ocr_api_server:latest
-          no-cache: true
-          progress: plain
