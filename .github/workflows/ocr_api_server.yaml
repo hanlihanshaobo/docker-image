@@ -1,11 +1,13 @@
-# This is a basic workflow to help you get started with Actions
+# Workflow to build and push the ocr_api_server Docker image
 name: build docker-ocr_api_server image
 
+# Controls when the workflow runs
 on:
+  # Allows manual triggering from the Actions tab
   workflow_dispatch:
     inputs:
       logLevel:
-        description: "Log level"
+        description: "Log level for the workflow"
         required: true
         default: "warning"
       tags:
@@ -13,56 +15,101 @@ on:
 
 jobs:
   buildx:
+    # Use the latest Ubuntu runner for GitHub Actions
     runs-on: ubuntu-latest
     steps:
+      # Check out the current repository
       - name: Checkout
         uses: actions/checkout@v2
 
+      # Get the current date and time for tagging the Docker image
       - name: Get current date
         id: date
         run: echo "::set-output name=today::$(date +'%Y-%m-%d_%H-%M')"
 
+      # Set up QEMU for multi-platform builds
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
+      # Set up Docker Buildx for multi-architecture builds
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
 
+      # Display available platforms for debugging
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
+      # Log in to DockerHub using secrets
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Clone the ocr_api_server source code
       - name: Clone source code
         run: |
+          # Show disk usage for debugging
           df -hT $PWD
+          # Clone the repository into a 'docker' directory
           git clone https://github.com/OpenListTeam/ocr_api_server.git docker
           cd docker
 
+      # Modify the Dockerfile dynamically to fix apt-get issues and add comments
       - name: Modify Dockerfile
         run: |
           cd docker
-          # 备份原始 Dockerfile
+          # Backup the original Dockerfile
           cp Dockerfile Dockerfile.bak
-          # 替换 apt-get 源为阿里云，并优化命令
-          sed -i 's|apt-get --allow-releaseinfo-change update|echo "deb http://mirrors.aliyun.com/debian buster main" > /etc/apt/sources.list \&\& apt-get update|g' Dockerfile
-          # 分离 apt-get install 命令并清理缓存
-          sed -i 's|apt install libgl1-mesa-glx libglib2.0-0 -y|apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 \&\& apt-get clean \&\& rm -rf /var/lib/apt/lists/*|g' Dockerfile
-          # 可选：分离 pip install 命令以便调试
-          sed -i 's|pip3 install --no-cache-dir -r requirements.txt|pip3 install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt|g' Dockerfile
+          # Replace the problematic RUN command with optimized, commented commands
+          cat << 'EOF' > Dockerfile
+# Use Python 3.8 slim-buster as the base image
+FROM python:3.8-slim-buster
 
+# Create the /app directory
+RUN mkdir /app
+
+# Copy necessary files to the /app directory
+COPY ./*.txt ./*.py ./*.sh ./*.onnx /app/
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Install dependencies and clean up in a single RUN to reduce layers
+RUN <<EOT
+  # Upgrade pip to the latest version
+  python3 -m pip install --upgrade pip
+  # Install Python dependencies from requirements.txt using Tsinghua mirror
+  pip3 install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+  # Clean up temporary files and pip cache
+  rm -rf /tmp/* /root/.cache/*
+  # Configure a reliable APT source (Aliyun) and install system dependencies
+  echo "deb http://mirrors.aliyun.com/debian buster main contrib non-free" > /etc/apt/sources.list
+  echo "deb http://mirrors.aliyun.com/debian buster-updates main contrib non-free" >> /etc/apt/sources.list
+  echo "deb http://mirrors.aliyun.com/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list
+  # Update package lists and install required libraries
+  apt-get update
+  apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0
+  # Clean up APT cache to reduce image size
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+EOT
+
+          # Display the modified Dockerfile for debugging
+          cat Dockerfile
+
+      # Build and push the Docker image
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./docker
           file: ./docker/Dockerfile
+          # Build for multiple architectures
           platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
+          # Push only if not a pull request
           push: ${{ github.event_name != 'pull_request' }}
+          # Tag the image with date and 'latest'
           tags: |
             hanshaobo/ocr_api_server:${{ steps.date.outputs.today }}
             hanshaobo/ocr_api_server:latest
