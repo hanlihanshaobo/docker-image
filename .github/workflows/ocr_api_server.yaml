@@ -37,10 +37,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Test network and repository access
+      - name: Test official Debian source connectivity
         run: |
-          ping -c 3 mirrors.aliyun.com
-          curl -I https://github.com/OpenListTeam/ocr_api_server.git
+          ping -c 3 deb.debian.org
+          ping -c 3 security.debian.org
 
       - name: Clone source code
         run: |
@@ -52,14 +52,6 @@ jobs:
           fi
           cd docker
           ls -la
-
-      - name: Modify APT sources
-        run: |
-          cd docker
-          echo "deb http://mirrors.aliyun.com/debian buster main" > sources.list
-          echo "deb http://mirrors.aliyun.com/debian buster-updates main" >> sources.list
-          echo "deb http://mirrors.aliyun.com/debian-security buster/updates main" >> sources.list
-          echo "COPY sources.list /etc/apt/sources.list" >> Dockerfile
 
       - name: Check requirements.txt
         run: |
