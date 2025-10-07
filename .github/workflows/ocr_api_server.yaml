@@ -1,12 +1,6 @@
-# This is a basic workflow to help you get started with Actions
 name: build docker-ocr_api_server image
-# Controls when the action will run.
+
 on:
-  #push:
-   # branches:
-  #    - main
-  # Allows you to run this workflow manually from the Actions tab
-  # 可以手动触发
   workflow_dispatch:
     inputs:
       logLevel:
@@ -18,7 +12,7 @@ on:
 
 jobs:
   buildx:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,28 +36,34 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
+      - name: Modify APT sources
+        run: |
+          cd docker
+          echo "deb http://mirrors.aliyun.com/debian buster main" > sources.list
+          echo "deb http://mirrors.aliyun.com/debian buster-updates main" >> sources.list
+          echo "deb http://mirrors.aliyun.com/debian-security buster/updates main" >> sources.list
+
       - name: Clone source code
-     #   working-directory: /workdir
         run: |
           df -hT $PWD
           git clone https://github.com/OpenListTeam/ocr_api_server.git docker
           cd docker
-          # npm install -g pnpm
-          # pnpm i
-          # pnpm build
-      #    sed -i '10 i RUN npm install -g npm@10.7.0' docker/build/Dockerfile
+
+      - name: Check requirements.txt
+        run: |
+          cd docker
+          cat requirements.txt
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./docker
           file: ./docker/Dockerfile
-          # 所需要的体系结构，可以在 Available platforms 步骤中获取所有的可用架构
-          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
-          # 镜像推送时间
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          # 给清单打上多个标签
           tags: |
             hanshaobo/ocr_api_server:${{ steps.date.outputs.today }}
             hanshaobo/ocr_api_server:latest
+          no-cache: true
+          progress: plain
